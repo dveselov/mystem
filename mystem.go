@@ -38,6 +38,16 @@ func symbolsToString(symbols *C.TSymbol, length C.int) string {
 	return string(runes)
 }
 
+func decodeGrammemes(grammemes []byte) []int {
+	var (
+		result []int
+	)
+	for _, grammeme := range grammemes {
+		result = append(result, int(grammeme))
+	}
+	return result
+}
+
 type Analyses struct {
 	handle unsafe.Pointer
 }
@@ -92,14 +102,8 @@ func (lemma *Lemma) Quality() int {
 }
 
 func (lemma *Lemma) StemGram() []int {
-	var (
-		grammemes []int
-	)
 	rawGrammemes := []byte(C.GoString(C.MystemLemmaStemGram(lemma.handle)))
-	for _, grammeme := range rawGrammemes {
-		grammemes = append(grammemes, int(grammeme))
-	}
-	return grammemes
+	return decodeGrammemes(rawGrammemes)
 }
 
 func (lemma *Lemma) FlexGramNum() int {
@@ -113,14 +117,8 @@ func (lemma *Lemma) FlexGram() [][]int {
 	gramCount := lemma.FlexGramNum()
 	rawGram := C.MystemLemmaFlexGram(lemma.handle)
 	for i := 0; i < gramCount; i++ {
-		var (
-			currentGramSet []int
-		)
 		currentRawGramSet := []byte(C.GoString(C.get_flex_gram_by_id(rawGram, C.int(i))))
-		for _, grammeme := range currentRawGramSet {
-			currentGramSet = append(currentGramSet, int(grammeme))
-		}
-		grammemes = append(grammemes, currentGramSet)
+		grammemes = append(grammemes, decodeGrammemes(currentRawGramSet))
 	}
 	return grammemes
 }

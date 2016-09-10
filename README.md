@@ -1,2 +1,2 @@
 # go-mystem
-Cgo bindings to Yandex.Mystem
+CGo bindings to Yandex.Mystem - russian morphology analyzer.

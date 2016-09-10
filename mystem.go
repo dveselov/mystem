@@ -3,6 +3,10 @@ package mystem
 /*
 #cgo LDFLAGS: -lmystem_c_binding
 #include "mystem.h"
+
+char* get_flex_gram_by_id(char** grammemes, int id) {
+	return grammemes[id];
+};
 */
 import "C"
 
@@ -67,21 +71,6 @@ type Lemma struct {
 	handle unsafe.Pointer
 }
 
-// Lemma quality constants
-const (
-	Dictionary  = 0        // слово из словаря
-	Bastard     = 1        // не словарное
-	Sob         = 2        // из "быстрого словаря"
-	Prefixoid   = 4        // словарное + стандартный префикс (авто- мото- кино- фото-) всегда в компании с Bastard или Sob
-	Foundling   = 8        // непонятный набор букв, но проходящий в алфавит
-	BadRequest  = 16       // доп. флаг.: "плохая лемма" при наличии "хорошей" альтернативы ("махать" по форме "маша")
-	FromEnglish = 65536    // переведено с английского
-	ToEnglish   = 131072   // переведено на английский
-	Untranslit  = 262144   // "переведено" с транслита
-	Overrode    = 1048576  // текст леммы был перезаписан
-	Fix         = 16777216 // слово из фикс-листа
-)
-
 func (lemma *Lemma) TextLength() C.int {
 	return C.MystemLemmaTextLen(lemma.handle)
 }
@@ -100,4 +89,38 @@ func (lemma *Lemma) Form() string {
 
 func (lemma *Lemma) Quality() int {
 	return int(C.MystemLemmaQuality(lemma.handle))
+}
+
+func (lemma *Lemma) StemGram() []int {
+	var (
+		grammemes []int
+	)
+	rawGrammemes := []byte(C.GoString(C.MystemLemmaStemGram(lemma.handle)))
+	for _, grammeme := range rawGrammemes {
+		grammemes = append(grammemes, int(grammeme))
+	}
+	return grammemes
+}
+
+func (lemma *Lemma) FlexGramNum() int {
+	return int(C.MystemLemmaFlexGramNum(lemma.handle))
+}
+
+func (lemma *Lemma) FlexGram() [][]int {
+	var (
+		grammemes [][]int
+	)
+	gramCount := lemma.FlexGramNum()
+	rawGram := C.MystemLemmaFlexGram(lemma.handle)
+	for i := 0; i < gramCount; i++ {
+		var (
+			currentGramSet []int
+		)
+		currentRawGramSet := []byte(C.GoString(C.get_flex_gram_by_id(rawGram, C.int(i))))
+		for _, grammeme := range currentRawGramSet {
+			currentGramSet = append(currentGramSet, int(grammeme))
+		}
+		grammemes = append(grammemes, currentGramSet)
+	}
+	return grammemes
 }

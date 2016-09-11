@@ -47,16 +47,25 @@ func decodeGrammemes(grammemes []byte) []int {
 	return result
 }
 
+func decodeGrammemesArray(grams **C.char, count int) [][]int {
+	var (
+		grammemes [][]int
+	)
+	for i := 0; i < count; i++ {
+		currentRawGramSet := []byte(C.GoString(C.get_flex_gram_by_id(grams, C.int(i))))
+		grammemes = append(grammemes, decodeGrammemes(currentRawGramSet))
+	}
+	return grammemes
+}
+
 type Analyses struct {
 	handle unsafe.Pointer
 }
 
 func NewAnalyses(word string) *Analyses {
 	cWord := stringToSymbols(word)
-	cWordLength := len(cWord)
 	analyses := new(Analyses)
-	handle := C.MystemAnalyze((*C.TSymbol)(unsafe.Pointer(&cWord[0])), C.int(cWordLength))
-	analyses.handle = handle
+	analyses.handle = C.MystemAnalyze((*C.TSymbol)(unsafe.Pointer(&cWord[0])), C.int(len(cWord)))
 	return analyses
 }
 
@@ -110,16 +119,8 @@ func (lemma *Lemma) FlexGramNum() int {
 }
 
 func (lemma *Lemma) FlexGram() [][]int {
-	var (
-		grammemes [][]int
-	)
-	gramCount := lemma.FlexGramNum()
 	rawGram := C.MystemLemmaFlexGram(lemma.handle)
-	for i := 0; i < gramCount; i++ {
-		currentRawGramSet := []byte(C.GoString(C.get_flex_gram_by_id(rawGram, C.int(i))))
-		grammemes = append(grammemes, decodeGrammemes(currentRawGramSet))
-	}
-	return grammemes
+	return decodeGrammemesArray(rawGram, lemma.FlexGramNum())
 }
 
 func (lemma *Lemma) GenerateForms() *Forms {
@@ -168,14 +169,6 @@ func (form *Form) FlexGramNum() int {
 }
 
 func (form *Form) FlexGram() [][]int {
-	var (
-		grammemes [][]int
-	)
-	gramCount := form.FlexGramNum()
 	rawGram := C.MystemFormFlexGram(form.handle)
-	for i := 0; i < gramCount; i++ {
-		currentRawGramSet := []byte(C.GoString(C.get_flex_gram_by_id(rawGram, C.int(i))))
-		grammemes = append(grammemes, decodeGrammemes(currentRawGramSet))
-	}
-	return grammemes
+	return decodeGrammemesArray(rawGram, form.FlexGramNum())
 }

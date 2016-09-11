@@ -1,4 +1,4 @@
-# go-mystem [![Build Status](https://travis-ci.org/dveselov/go-mystem.svg?branch=master)](https://travis-ci.org/dveselov/go-mystem) [![GoDoc](https://godoc.org/github.com/dveselov/go-mystem?status.svg)](https://godoc.org/github.com/dveselov/go-mystem) [![Go Report Card](https://goreportcard.com/badge/github.com/dveselov/go-mystem)](https://goreportcard.com/report/github.com/dveselov/go-mystem)
+# go-mystem [![Build Status](https://travis-ci.org/dveselov/go-mystem.svg?branch=master)](https://travis-ci.org/dveselov/go-mystem) [![GoDoc](https://godoc.org/github.com/dveselov/go-mystem?status.svg)](https://godoc.org/github.com/dveselov/go-mystem) [![Go Report Card](https://goreportcard.com/badge/github.com/dveselov/go-mystem)](https://goreportcard.com/report/github.com/dveselov/go-mystem) [![Coverage Status](https://coveralls.io/repos/github/dveselov/go-mystem/badge.svg)](https://coveralls.io/github/dveselov/go-mystem)
 CGo bindings to Yandex.Mystem - russian morphology analyzer.
 
 # Install

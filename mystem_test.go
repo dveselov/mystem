@@ -79,6 +79,36 @@ func TestGetLemmaFlexGrammemes(t *testing.T) {
 	}
 }
 
+func TestGetLemmaForms(t *testing.T) {
+	analyses := NewAnalyses("маша")
+	defer analyses.Close()
+	lemma := analyses.GetLemma(0)
+	forms := lemma.GenerateForms()
+	if forms.Count() != 10 {
+		t.Fail()
+	}
+}
+
+func TestGetForm(t *testing.T) {
+	analyses := NewAnalyses("маша")
+	defer analyses.Close()
+	lemma := analyses.GetLemma(0)
+	forms := lemma.GenerateForms()
+	form := forms.Get(0)
+	if form.TextLength() != 3 {
+		t.Fail()
+	}
+	if form.Text() != "маш" {
+		t.Fail()
+	}
+	if !reflect.DeepEqual(form.StemGram(), []int{Substantive, FirstName, Feminine, Animated}) {
+		t.Fail()
+	}
+	if !reflect.DeepEqual(form.FlexGram()[0], []int{Accusative, Plural}) {
+		t.Fail()
+	}
+}
+
 func BenchmarkMystem(b *testing.B) {
 	mystem := NewAnalyses("маша")
 	defer mystem.Close()

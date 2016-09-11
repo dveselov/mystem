@@ -3,7 +3,6 @@ package mystem
 /*
 #cgo LDFLAGS: -lmystem_c_binding
 #include "mystem.h"
-
 char* get_flex_gram_by_id(char** grammemes, int id) {
 	return grammemes[id];
 };
@@ -116,6 +115,64 @@ func (lemma *Lemma) FlexGram() [][]int {
 	)
 	gramCount := lemma.FlexGramNum()
 	rawGram := C.MystemLemmaFlexGram(lemma.handle)
+	for i := 0; i < gramCount; i++ {
+		currentRawGramSet := []byte(C.GoString(C.get_flex_gram_by_id(rawGram, C.int(i))))
+		grammemes = append(grammemes, decodeGrammemes(currentRawGramSet))
+	}
+	return grammemes
+}
+
+func (lemma *Lemma) GenerateForms() *Forms {
+	forms := new(Forms)
+	forms.handle = C.MystemGenerate(lemma.handle)
+	return forms
+}
+
+type Forms struct {
+	handle unsafe.Pointer
+}
+
+type Form struct {
+	handle unsafe.Pointer
+}
+
+func (forms *Forms) Count() int {
+	return int(C.MystemFormsCount(forms.handle))
+}
+
+func (forms *Forms) Close() {
+	C.MystemDeleteForms(forms.handle)
+}
+
+func (forms *Forms) Get(id int) *Form {
+	form := new(Form)
+	form.handle = C.MystemForm(forms.handle, C.int(id))
+	return form
+}
+
+func (form *Form) TextLength() C.int {
+	return C.MystemFormTextLen(form.handle)
+}
+
+func (form *Form) Text() string {
+	return symbolsToString(C.MystemFormText(form.handle), form.TextLength())
+}
+
+func (form *Form) StemGram() []int {
+	rawGrammemes := []byte(C.GoString(C.MystemFormStemGram(form.handle)))
+	return decodeGrammemes(rawGrammemes)
+}
+
+func (form *Form) FlexGramNum() int {
+	return int(C.MystemFormFlexGramNum(form.handle))
+}
+
+func (form *Form) FlexGram() [][]int {
+	var (
+		grammemes [][]int
+	)
+	gramCount := form.FlexGramNum()
+	rawGram := C.MystemFormFlexGram(form.handle)
 	for i := 0; i < gramCount; i++ {
 		currentRawGramSet := []byte(C.GoString(C.get_flex_gram_by_id(rawGram, C.int(i))))
 		grammemes = append(grammemes, decodeGrammemes(currentRawGramSet))

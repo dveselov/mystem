@@ -2,7 +2,7 @@
 CGo bindings to Yandex.Mystem - russian morphology analyzer.
 
 # Usage
-``go
+```go
 package main
 
 import (

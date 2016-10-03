@@ -18,7 +18,7 @@ import (
     "fmt"
 )
 
-import "github.com/dveselov/go-mystem"
+import "github.com/dveselov/mystem"
 
 func main() {
     analyses := mystem.NewAnalyses("маша")

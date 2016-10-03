@@ -7,7 +7,7 @@ $ wget https://github.com/yandex/tomita-parser/releases/download/v1.0/libmystem_
 $ unzip libmystem_c_binding.so.linux_x64.zip
 $ sudo cp libmystem_c_binding.so /usr/lib/
 $ sudo ln -s /usr/lib/libmystem_c_binding.so /usr/lib/libmystem_c_binding.so.1
-$ go get -u github.com/dveselov/go-mystem
+$ go get -u github.com/dveselov/mystem
 ```
 
 # Usage
